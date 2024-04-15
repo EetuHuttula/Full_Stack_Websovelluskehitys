@@ -1,14 +1,26 @@
 import React, { useState } from 'react';
+import axios from 'axios';
 
-const AddPerson = ({ addNewName }) => {
+const AddPerson = ({ addNewPerson }) => {
   const [newName, setNewName] = useState('');
   const [number, setNumber] = useState('');
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    addNewName(newName, number);
-    setNewName('');
-    setNumber('');
+    const newPerson = {
+      name: newName,
+      number: number
+    };
+    axios
+      .post('http://localhost:3001/persons', newPerson)
+      .then(response => {
+        addNewPerson(response.data);
+        setNewName('');
+        setNumber('');
+      })
+      .catch(error => {
+        console.error('Error adding person:', error);
+      });
   };
 
   return (

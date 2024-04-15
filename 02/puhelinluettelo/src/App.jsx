@@ -1,25 +1,49 @@
-import React, { useState } from 'react';
-import AddNewName from './components/AddPerson.jsx';
+import React, { useState, useEffect } from 'react';
+import AddPerson from './components/AddPerson.jsx';
 import Filter from './components/FilterSearch.jsx';
 import PersonsList from './components/PersonsList.jsx';
+import personServerHelpers from './components/personServerHelpers';
 
 const App = () => {
-  const [persons, setPersons] = useState([
-    { name: 'Arto Hellas', number: '040-123456' },
-    { name: 'Ada Lovelace', number: '39-44-5323523' },
-    { name: 'Dan Abramov', number: '12-43-234345' },
-    { name: 'Mary Poppendieck', number: '39-23-6423122' }
-  ]) 
+  const [persons, setPersons] = useState([]);
   const [filterWords, setFilterWords] = useState("");
-  
-  const addNewName = (newName, number) => {
-    const newPerson ={
-      name: newName,
-      number: number,
-    }
-    setPersons([...persons, newPerson])
-  }
+ 
+  useEffect(() => {
+    personServerHelpers.getAllPersons()
+      .then(initialPersons => {
+        setPersons(initialPersons);
+      });
+  }, []);
 
+  const addNewPerson = (newPerson) => {
+    const existingPerson = persons.find(person => person.name === newPerson.name);
+    if (existingPerson) {
+      const confirmUpdate = window.confirm(`${newPerson.name} is already added to the phonebook, replace the old number with a new one?`);
+      if (confirmUpdate) {
+        personServerHelpers.updatePerson(existingPerson.id, newPerson)
+          .then(updatedPerson => {
+            setPersons(persons.map(person => 
+              person.id !== existingPerson.id ? person : updatedPerson
+            ));
+          });
+      }
+    } else {
+      personServerHelpers.createPerson(newPerson)
+        .then(returnedPerson => {
+          setPersons([...persons, returnedPerson]);
+        });
+    }
+  };
+  const handleDelete = (id) => {
+    const confirmDelete = window.confirm('Are you sure you want to delete this person?');
+    if (confirmDelete) {
+      personServerHelpers.deletePerson(id)
+        .then(() => {
+          setPersons(persons.filter(person => person.id !== id));
+        });
+    }
+  };
+  
   const handleFilterChange = (event) => {
     setFilterWords(event.target.value);
   };
@@ -34,10 +58,10 @@ const App = () => {
       <Filter filterWords={filterWords} handleFilterChange={handleFilterChange} />
       
       <h2>Add a new</h2>
-      <AddNewName addNewName={addNewName} />
+      <AddPerson addNewPerson={addNewPerson} />
 
       <h2>Numbers</h2>
-      <PersonsList persons={showFilteredPersons} />
+      <PersonsList persons={showFilteredPersons} handleDelete={handleDelete}/>
     </div>
   );
 };
