@@ -12,7 +12,7 @@ const AddPerson = ({ addNewPerson }) => {
       number: number
     };
     axios
-      .post('http://localhost:3001/persons', newPerson)
+      .post('/api/persons', newPerson)
       .then(response => {
         addNewPerson(response.data);
         setNewName('');

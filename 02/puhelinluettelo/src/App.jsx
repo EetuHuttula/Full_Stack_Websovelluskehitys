@@ -3,7 +3,7 @@ import AddPerson from './components/AddPerson.jsx';
 import Filter from './components/FilterSearch.jsx';
 import PersonsList from './components/PersonsList.jsx';
 import personServerHelpers from './components/personServerHelpers';
-import './App.css'; // Tuodaan CSS-tiedosto, jossa määritellään viestityylit
+import './App.css';
 
 const App = () => {
   const [persons, setPersons] = useState([]);
