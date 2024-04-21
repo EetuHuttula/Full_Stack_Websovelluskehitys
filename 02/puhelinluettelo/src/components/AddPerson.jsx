@@ -11,16 +11,9 @@ const AddPerson = ({ addNewPerson }) => {
       name: newName,
       number: number
     };
-    axios
-      .post('/api/persons', newPerson)
-      .then(response => {
-        addNewPerson(response.data);
-        setNewName('');
-        setNumber('');
-      })
-      .catch(error => {
-        console.error('Error adding person:', error);
-      });
+      addNewPerson(newPerson);
+      setNewName('');
+      setNumber('');
   };
 
   return (
